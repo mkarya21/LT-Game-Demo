@@ -1,0 +1,25 @@
+<font>
+	<info face="/Users/cstadler/Desktop\@sosick-chicken-soupfileOriginalSuperName-export" size="155" />
+	<common lineHeight="155" scaleW="404" scaleH="413" pages="1" />
+	<pages>
+		<page id="0" file="/Users/cstadler/Desktop\@sosick-chicken-soupfileOriginalSuperName-export.png" />
+	</pages>
+	<chars count="14">
+		<char id="49" x="307" y="143" width="31" height="136" xoffset="44" yoffset="19" xadvance="32" /><!-- 1 -->
+		<char id="50" x="120" y="0" width="98" height="136" xoffset="10" yoffset="20" xadvance="99" /><!-- 2 -->
+		<char id="51" x="0" y="140" width="107" height="137" xoffset="6" yoffset="16" xadvance="108" /><!-- 3 -->
+		<char id="52" x="0" y="0" width="119" height="139" xoffset="0" yoffset="17" xadvance="120" /><!-- 4 -->
+		<char id="53" x="106" y="278" width="98" height="134" xoffset="10" yoffset="21" xadvance="99" /><!-- 5 -->
+		<char id="54" x="210" y="137" width="96" height="139" xoffset="11" yoffset="18" xadvance="97" /><!-- 6 -->
+		<char id="55" x="307" y="0" width="96" height="142" xoffset="11" yoffset="16" xadvance="97" /><!-- 7 -->
+		<char id="56" x="108" y="140" width="101" height="136" xoffset="9" yoffset="19" xadvance="102" /><!-- 8 -->
+		<char id="57" x="205" y="277" width="90" height="135" xoffset="14" yoffset="17" xadvance="91" /><!-- 9 -->
+		<char id="48" x="0" y="278" width="105" height="134" xoffset="7" yoffset="20" xadvance="106" /><!-- 0 -->
+		<char id="45" x="219" y="50" width="72" height="27" xoffset="23" yoffset="74" xadvance="73" /><!-- - -->
+		<char id="61" x="219" y="0" width="76" height="49" xoffset="21" yoffset="65" xadvance="77" /><!-- = -->
+		<char id="32" x="0" y="0" width="0" height="0" xoffset="0" yoffset="0" xadvance="20" /><!--   -->
+		<char id="9" x="0" y="0" width="0" height="0" xoffset="0" yoffset="0" xadvance="160" /><!-- 	 -->
+	</chars>
+	<kernings count="0">
+	</kernings>
+</font>
