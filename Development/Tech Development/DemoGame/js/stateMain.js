@@ -244,11 +244,10 @@ var StateMain={
     selectRow:function(playerDice){
     	playerDice.inputEnabled=false;
     	playerDice.game.canvas.style.cursor = "cursor";
-    	diceNumber=parseInt(diceNumber.slice(-1));
-    	var element = (diceNumber-1)*p1D.length;
+    	var element=playerDice.animations.currentAnim.name;
+    	element = parseInt(element.slice(-1));
+    	element = (element-1)*p1D.length;
     		for(j=0;j<p1D.length;j++){
-    			console.log(element);
-    			console.log(table[element]);
 		    	table[element].inputEnabled=true;
     			table[element].game.canvas.style.cursor = "cursor";
 		    	element++;
