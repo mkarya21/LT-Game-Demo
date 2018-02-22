@@ -1,4 +1,4 @@
-var captionBg,homeBtn,restartBtn,audioBtn,resizeBtn,startBtn,langCheckBtn,titleTxt,titleBg1,titleBg2,checked=true,turn=true;
+var captionBg,homeBtn,restartBtn,audioBtn,resizeBtn,startBtn,langCheckBtn,titleTxt,titleBg1,titleBg2,checked=true,turn=true,problemSelected,tileName,tileFrame;
 var player1,player2,staticDice,text; 
 var p1D1,p1D2,p1D3,p1D4,p1D5,p1D6;
 var p1D=["p1D1","p1D2","p1D3","p1D4","p1D5","p1D6"];
@@ -52,6 +52,8 @@ var StateMain={
        StateMain.load.spritesheet('p1D','assets/images/dice-roll-200x200-spritesheet.png',200,200);
        StateMain.load.spritesheet('topBarNumber','assets/images/blank-space-number-sprite.png',64,64);
        StateMain.load.spritesheet('tableRow','assets/images/tile-number-sprite.png',100,100);
+       StateMain.load.spritesheet('tile','assets/images/tile-sprite-new',100,100);
+       StateMain.load.spritesheet('tile2','assets/images/tile-color-sprite',100,100);
     },
     
     create:function()
@@ -111,6 +113,7 @@ var StateMain={
     		p1D[i].visible=false;
     		p1D[i].inputEnabled=false;
     		p1D[i].game.canvas.style.cursor = "default";
+    		p1D[i].alpha=0.5;
     	}
     	for(i=0;i<p2D.length;i++){
     		var name=p2D[i];
@@ -122,10 +125,11 @@ var StateMain={
     		p2D[i].visible=false;
     		p2D[i].inputEnabled=false;
     		p2D[i].game.canvas.style.cursor = "default";
+    		p2D[i].alpha=0.5;
     	}
     	for(i=0;i<ans.length;i++){
     		var name=ans[i];
-    		ans[i]=game.add.button(ansLeft,ansTop,'topBarNumber',this.selectAnsRow,this);
+    		ans[i]=game.add.button(ansLeft,ansTop,'topBarNumber',this.checkAnswer,this);
     		ans[i].animations.add(name);
     		ansLeft+=30;
     		ans[i].scale.setTo(0.5);
@@ -133,6 +137,7 @@ var StateMain={
     		ans[i].visible=false;
     		ans[i].inputEnabled=false;
     		ans[i].game.canvas.style.cursor = "default";
+    		ans[i].alpha=0.5;
     	}
     	for(i=0;i<p1D.length;i++){
     		for(j=0;j<p1D.length;j++){
@@ -140,16 +145,19 @@ var StateMain={
     			table[k]=row;
     			table[k] = game.add.button(rowLeft,rowTop,'tableRow',this.selectProblem,this);
 		    	table[k].scale.setTo(0.5);
+		    	table[k].animations.add(tableValue[k]);
 		    	table[k].frame=tableValue[k];
 		    	table[k].visible=false;
 		    	table[k].inputEnabled=false;
     			table[k].game.canvas.style.cursor = "default";
+    			table[k].alpha=0.5;
 		    	rowLeft+=50;
 		    	k++;
     		}
     		rowTop+=100;
     		rowLeft=150;
     	}
+
     },
     
     update:function()
@@ -238,34 +246,72 @@ var StateMain={
 	    setTimeout(function(){
 	    	staticDice.animations.stop();
 	    	staticDice.frame=rand;
-	    	StateMain.activePlayerColumn(diceNumber);
+	    	if(turn){
+	    		activeDice=p1D;
+	    		tileName='tile';
+	    		tileFrame=0;
+	    	}
+	    	else{
+	    		activeDice=p2D;
+	    		tileName='tile2';
+	    		tileFrame=3;
+	    	}
+	    	StateMain.activePlayerColumn(activeDice,diceNumber);
+	    	turn=!turn;
 	    },3000);
     },
     selectRow:function(playerDice){
     	playerDice.inputEnabled=false;
-    	playerDice.game.canvas.style.cursor = "cursor";
+    	playerDice.game.canvas.style.cursor = "default";
+    	playerDice.alpha=0.5;
     	var element=playerDice.animations.currentAnim.name;
     	element = parseInt(element.slice(-1));
     	element = (element-1)*p1D.length;
     		for(j=0;j<p1D.length;j++){
 		    	table[element].inputEnabled=true;
     			table[element].game.canvas.style.cursor = "cursor";
+    			table[element].alpha=1;
 		    	element++;
     		}
     },
-    activePlayerColumn:function(diceNumber){
-    	if(turn){
-	    	p1D[diceNumber].inputEnabled=true;
-    		p1D[diceNumber].game.canvas.style.cursor = "cursor";
-	    }
-	    else{
-	    	p2D[diceNumber].inputEnabled=true;
-    		p2D[diceNumber].game.canvas.style.cursor = "cursor";
-	    }	    
-	    turn=!turn;
+    activePlayerColumn:function(player,diceNumber){
+	    	player[diceNumber].inputEnabled=true;
+    		player[diceNumber].game.canvas.style.cursor = "cursor";
+    		player[diceNumber].alpha=1;
     },
-    selectProblem:function(){
-    	console.log("in");
+    selectProblem:function(problemSelector){
+    	for(i=0;i<table.length;i++){
+	    	table[i].alpha=0.5;
+    	}
+    	problemSelector.alpha=1;
+    	problemSelected=problemSelector;
+    	for(i=0;i<ans.length;i++){
+    		ans[i].alpha=0.5;
+	    	ans[i].inputEnabled=true;
+    		ans[i].game.canvas.style.cursor = "cursor";
+    	}
+    },checkAnswer:function(userAns){
+    		var problem=problemSelected.animations.currentAnim.name
+    		var userAnswer=userAns.animations.currentAnim.name;
+    		userAnswer=parseInt(userAnswer.slice(-1));
+    		if(problem==userAnswer){
+    			userAns.alpha=1;
+    			console.log(tileName,tileFrame);
+    			problemSelected.loadTexture(tileName,tileFrame);
+    			problemSelected.inputEnabled=false;
+    			problemSelected.game.canvas.style.cursor = "default";
+    			setTimeout(function() {
+    				player1.frame=turn ? 1 : 0;
+    				player2.frame=!turn ? 1 : 0;
+    				for(i=0;i<ans.length;i++){
+	    				ans[i].alpha=0.5;
+    				}
+    				staticDice.inputEnabled=true;
+    				staticDice.game.canvas.style.cursor = "cursor";
+    			},1000);
+    		}
+    		else
+    			userAns.alpha=0.1;
     }    
 }
     	
