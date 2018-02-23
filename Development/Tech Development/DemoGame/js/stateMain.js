@@ -1,5 +1,5 @@
 var captionBg,homeBtn,restartBtn,audioBtn,resizeBtn,startBtn,langCheckBtn,titleTxt,titleBg1,titleBg2,checked=true,turn=true,problemSelected,tileName,tileFrame;
-var player1,player2,staticDice,text; 
+var player1,player2,staticDice,text,multiplayer=false,p2Random; 
 var p1D1,p1D2,p1D3,p1D4,p1D5,p1D6;
 var p1D=["p1D1","p1D2","p1D3","p1D4","p1D5","p1D6"];
 var p2D1,p2D2,p2D3,p2D4,p2D5,p2D6;
@@ -63,8 +63,8 @@ var StateMain={
     	titleTxt.scale.setTo(0.5);
     	titleBg1 = game.add.button(game.world.centerX-200,game.world.centerY-100, 'titleBg1',this.singlePlayer,this,1,0,0);
     	titleBg1.scale.setTo(0.5);
-    	titleBg1.inputEnabled=false;
-    	titleBg1.game.canvas.style.cursor = "default";
+    	/*titleBg1.inputEnabled=false;
+    	titleBg1.game.canvas.style.cursor = "default";*/
     	titleBg2 = game.add.button(game.world.centerX+50,game.world.centerY-100, 'titleBg2',this.twoPlayer,this,1,0,0);
     	titleBg2.scale.setTo(0.5);
     	titleBg2.game.canvas.style.cursor = "cursor";
@@ -216,6 +216,8 @@ var StateMain={
     	checked=!checked;
     },
     singlePlayer:function () {
+    	multiplayer=false;
+    	console.log("multiplayer",multiplayer);
     	titleBg2.setFrames(1,0,0);
     	if(titleBg1.texture.frame.x==0){
     		titleBg1.setFrames(0,2,0);
@@ -223,8 +225,12 @@ var StateMain={
     	else{
     		titleBg1.setFrames(1,0,0);
     	}
+    	startBtn.inputEnabled=true;
+    	startBtn.game.canvas.style.cursor = "cursor";
     },
     twoPlayer:function(){
+    	multiplayer=true;
+    	console.log("multiplayer",multiplayer);
     	titleBg1.setFrames(1,0,0);
     	if(titleBg2.frame==0){
     		titleBg2.setFrames(0,2,0);
@@ -257,7 +263,6 @@ var StateMain={
 	    		tileFrame=3;
 	    	}
 	    	StateMain.activePlayerColumn(activeDice,diceNumber);
-	    	turn=!turn;
 	    },3000);
     },
     selectRow:function(playerDice){
@@ -275,8 +280,17 @@ var StateMain={
     		}
     },
     activePlayerColumn:function(player,diceNumber){
-	    	player[diceNumber].inputEnabled=true;
-    		player[diceNumber].game.canvas.style.cursor = "cursor";
+	    	if(turn || multiplayer){
+	    		player[diceNumber].inputEnabled=true;
+    			player[diceNumber].game.canvas.style.cursor = "cursor";
+    		}
+    		else{
+    			var rangeMin= diceNumber*6;
+    			var rangeMax = rangeMin+5;
+    			p2Random = Math.floor(Math.random()*(rangeMax-rangeMin+1)+rangeMin);
+    			console.log("random=",p2Random);
+    			StateMain.selectProblem(table[p2Random]);
+    		}
     		player[diceNumber].alpha=1;
     },
     selectProblem:function(problemSelector){
@@ -287,16 +301,22 @@ var StateMain={
     	problemSelected=problemSelector;
     	for(i=0;i<ans.length;i++){
     		ans[i].alpha=0.5;
-	    	ans[i].inputEnabled=true;
-    		ans[i].game.canvas.style.cursor = "cursor";
+	    	if(turn || multiplayer){
+	    		ans[i].inputEnabled=true;
+    			ans[i].game.canvas.style.cursor = "cursor";
+    		}
+    		else{
+    			var userAns=parseInt(tableValue[p2Random])-1;
+    			StateMain.checkAnswer(ans[userAns]);
+    		}
     	}
     },checkAnswer:function(userAns){
-    		var problem=problemSelected.animations.currentAnim.name
+    		var problem=problemSelected.animations.currentAnim.name;
     		var userAnswer=userAns.animations.currentAnim.name;
     		userAnswer=parseInt(userAnswer.slice(-1));
     		if(problem==userAnswer){
+    			turn=!turn;
     			userAns.alpha=1;
-    			console.log(tileName,tileFrame);
     			problemSelected.loadTexture(tileName,tileFrame);
     			problemSelected.inputEnabled=false;
     			problemSelected.game.canvas.style.cursor = "default";
@@ -306,8 +326,17 @@ var StateMain={
     				for(i=0;i<ans.length;i++){
 	    				ans[i].alpha=0.5;
     				}
-    				staticDice.inputEnabled=true;
-    				staticDice.game.canvas.style.cursor = "cursor";
+    				if(turn || multiplayer){
+    					staticDice.inputEnabled=true;
+    					staticDice.game.canvas.style.cursor = "cursor";
+    				}
+    				else{
+    					if(!turn)
+    						StateMain.rollDice();
+    				}
+    				for(i=0;i<p2D.length;i++){
+	    				p2D[i].alpha=0.5;
+    				}
     			},1000);
     		}
     		else
