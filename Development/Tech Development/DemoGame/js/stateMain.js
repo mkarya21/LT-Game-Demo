@@ -1,4 +1,4 @@
-var captionBg,homeBtn,restartBtn,audioBtn,resizeBtn,startBtn,langCheckBtn,titleTxt,titleBg1,titleBg2,checked=true,turn=true,problemSelected,tileName,tileFrame;
+var captionBg,homeBtn,restartBtn,audioBtn,resizeBtn,startBtn,langCheckBtn,titleTxt,titleBg1,titleBg2,checked=true,turn=true,problemSelected,tileName,tileFrame,isScaled=false;
 var player1,player2,staticDice,text,multiplayer=false,p2Random; 
 var p1D1,p1D2,p1D3,p1D4,p1D5,p1D6;
 var p1D=["p1D1","p1D2","p1D3","p1D4","p1D5","p1D6"];
@@ -29,7 +29,8 @@ var p1DLeft=50,p1DTop=200;
 var p2DLeft=450,p2DTop=200;
 var ansLeft=150,ansTop=150;
 var rowLeft=150,rowTop=220;
-var diceImgArray = [1, 7, 43, 31, 19, 13]; 
+var diceImgArray = [1, 7, 43, 31, 19, 13];
+var music,isPlaying=false;
 var StateMain={    
    preload:function()
     {
@@ -54,17 +55,24 @@ var StateMain={
        StateMain.load.spritesheet('tableRow','assets/images/tile-number-sprite.png',100,100);
        StateMain.load.spritesheet('tile','assets/images/tile-sprite-new',100,100);
        StateMain.load.spritesheet('tile2','assets/images/tile-color-sprite',100,100);
+       StateMain.load.audio('guitar', ['assets/audio/guitar-maracas.mp3', 'assets/audio/guitar-maracas.ogg']);
     },
     
     create:function()
     {
+    	// Stretch to fill
+	    game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+
+	    // Keep original size
+	    // game.scale.fullScreenScaleMode = Phaser.ScaleManager.NO_SCALE;
+
+	    // Maintain aspect ratio
+	    // game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
     	game.add.sprite(0,0,'bg');
     	titleTxt = game.add.sprite(50,50,'titleTxt');
     	titleTxt.scale.setTo(0.5);
     	titleBg1 = game.add.button(game.world.centerX-200,game.world.centerY-100, 'titleBg1',this.singlePlayer,this,1,0,0);
     	titleBg1.scale.setTo(0.5);
-    	/*titleBg1.inputEnabled=false;
-    	titleBg1.game.canvas.style.cursor = "default";*/
     	titleBg2 = game.add.button(game.world.centerX+50,game.world.centerY-100, 'titleBg2',this.twoPlayer,this,1,0,0);
     	titleBg2.scale.setTo(0.5);
     	titleBg2.game.canvas.style.cursor = "cursor";
@@ -79,12 +87,8 @@ var StateMain={
     	restartBtn.game.canvas.style.cursor = "default";
     	audioBtn = game.add.button(500,0, 'audioImg',this.audioClicked,this,1,0,0);
     	audioBtn.scale.setTo(0.5);
-    	audioBtn.inputEnabled=false;
-    	audioBtn.game.canvas.style.cursor = "default";
     	resizeBtn = game.add.button(550,0, 'resizeImg',this.resizeClicked,this,1,0,0);
     	resizeBtn.scale.setTo(0.5);
-    	resizeBtn.inputEnabled=false;
-    	resizeBtn.game.canvas.style.cursor = "default";
     	startBtn = game.add.button(game.world.centerX - 85,game.world.centerY + 210, 'startImg',this.startClicked,this,1,0,0);
     	startBtn.scale.setTo(0.5);
     	startBtn.inputEnabled=false;
@@ -157,12 +161,39 @@ var StateMain={
     		rowTop+=100;
     		rowLeft=150;
     	}
-
+    	music = game.add.audio('guitar');
+    	music.play();
+    	music.onStop.add(this.musicStopped, this);
+    	isPlaying=true;
     },
-    
+    render:function() {
+    	//game.debug.soundInfo(music, 20, 32);
+	},
     update:function()
     {       
 
+    },
+    audioClicked:function(){
+    	if(isPlaying)
+    		audioBtn.setFrames(3,2,0);
+    	else
+    		audioBtn.setFrames(1,0,0);
+    	music.mute = isPlaying;
+    	isPlaying=!isPlaying;
+    },
+    musicStopped:function(){
+    	music.restart();
+    },
+    resizeClicked:function(){
+    	if(isScaled){
+    		resizeBtn.setFrames(1,0,0);
+    		game.scale.stopFullScreen();
+    	}
+    	else{
+    		resizeBtn.setFrames(3,2,0);
+    		game.scale.startFullScreen(false);
+    	}
+    	isScaled=!isScaled;
     },
     startClicked:function(){
 	    titleTxt.visible = false;
@@ -187,10 +218,12 @@ var StateMain={
     	}
     },
     homeClicked:function(){
-    	console.log("clicked");
+    	//console.log("Homeclicked");
     	titleTxt.visible = true;
     	titleBg1.visible = true;
+    	titleBg1.setFrames(1,0,0);
     	titleBg2.visible = true;
+    	titleBg2.setFrames(1,0,0);
     	startBtn.visible = true;
     	langCheckBtn.visible = true;
     	player1.visible=false;
@@ -210,6 +243,7 @@ var StateMain={
     	}
     	startBtn.inputEnabled=false;
     	startBtn.game.canvas.style.cursor = "default";
+    	music.restart();
     },
     langChecked:function(){
     	langCheckBtn.frame=(checked) ? 1 : 0;
